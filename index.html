@@ -1,86 +1,210 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EtsyPilot</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EtsyPilot</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+<style>
+body{
+margin:0;
+background:#0d0d0f;
+color:white;
+font-family:Arial,sans-serif;
+}
+.app{
+max-width:600px;
+margin:auto;
+padding:25px 18px;
+}
+h1{
+text-align:center;
+font-size:38px;
+margin-bottom:5px;
+}
+h1 span{color:#ff5a5f}
+.subtitle{
+text-align:center;
+color:#aaa;
+margin-bottom:30px;
+}
+.card{
+background:#19191d;
+padding:20px;
+border-radius:18px;
+margin-bottom:18px;
+}
+label{
+display:block;
+margin-top:15px;
+margin-bottom:6px;
+font-weight:bold;
+}
+input,select,textarea{
+width:100%;
+box-sizing:border-box;
+padding:14px;
+border-radius:12px;
+border:1px solid #333;
+background:#101014;
+color:white;
+font-size:16px;
+}
+textarea{height:90px}
+button{
+width:100%;
+padding:17px;
+margin-top:20px;
+border:0;
+border-radius:14px;
+background:#ff5a5f;
+color:white;
+font-size:17px;
+font-weight:bold;
+}
+#result{display:none}
+.box{
+background:#101014;
+padding:14px;
+border-radius:10px;
+margin-top:8px;
+white-space:pre-wrap;
+}
+.tag{
+display:inline-block;
+background:#303036;
+padding:7px 10px;
+margin:4px;
+border-radius:20px;
+font-size:13px;
+}
+</style>
+</head>
 
-    body {
-      margin: 0;
-      background: #0d0d0f;
-      color: white;
-    }
+<body>
 
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 25px 18px 50px;
-    }
+<div class="app">
 
-    .logo {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+<h1>Etsy<span>Pilot</span></h1>
+<p class="subtitle">Ton assistant pour créer tes fiches Etsy 🚀</p>
 
-    .logo h1 {
-      font-size: 38px;
-      margin-bottom: 5px;
-    }
+<div class="card">
 
-    .logo span {
-      color: #ff5a5f;
-    }
+<label>Type de produit</label>
+<select id="type">
+<option>Affiche voiture</option>
+<option>Affiche moto</option>
+<option>Affiche camion</option>
+<option>Pack automobile</option>
+</select>
 
-    .logo p {
-      color: #aaa;
-      margin-top: 0;
-    }
+<label>Modèle ou thème</label>
+<input id="model" placeholder="Ex : BMW M3 E46">
 
-    .card {
-      background: #19191d;
-      border: 1px solid #2b2b31;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 18px;
-    }
+<label>Nombre d'affiches</label>
+<select id="qty">
+<option>1</option>
+<option>4</option>
+<option>5</option>
+<option selected>10</option>
+</select>
 
-    label {
-      display: block;
-      font-weight: bold;
-      margin: 15px 0 7px;
-    }
+<label>Style</label>
+<select id="style">
+<option>Premium</option>
+<option>Racing</option>
+<option>JDM</option>
+<option>Vintage</option>
+<option>Luxe</option>
+</select>
 
-    input,
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #36363d;
-      border-radius: 12px;
-      background: #111114;
-      color: white;
-      font-size: 16px;
-    }
+<label>Informations supplémentaires</label>
+<textarea id="info" placeholder="Ex : années 90, fond sombre..."></textarea>
 
-    textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
+<button onclick="generate()">✨ Générer ma fiche Etsy</button>
 
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 14px;
-      padding: 17px;
-      margin-top: 20px;
-      font-size: 17px;
-      font-weight: bold;
-      background: #ff5a5f;
-      color: white;
-     
+</div>
+
+<div class="card" id="result">
+
+<h2>✅ Fiche prête</h2>
+
+<label>Titre</label>
+<div class="box" id="title"></div>
+
+<label>Prix conseillé</label>
+<div class="box" id="price"></div>
+
+<label>Description</label>
+<div class="box" id="desc"></div>
+
+<label>13 tags Etsy</label>
+<div id="tags"></div>
+
+</div>
+
+</div>
+
+<script>
+function generate(){
+
+let type=document.getElementById("type").value;
+let model=document.getElementById("model").value || type;
+let qty=document.getElementById("qty").value;
+let style=document.getElementById("style").value;
+
+let price="8,90 €";
+if(qty=="1")price="3,90 €";
+if(qty=="4")price="5,90 €";
+if(qty=="5")price="6,90 €";
+
+document.getElementById("title").innerText=
+"Pack "+qty+" affiches "+model+
+" | Poster "+style+
+" | Déco garage | Téléchargement numérique";
+
+document.getElementById("price").innerText=price;
+
+document.getElementById("desc").innerText=
+"🏁 COLLECTION "+model.toUpperCase()+"\n\n"+
+"Découvrez ce pack de "+qty+
+" affiche(s) numérique(s) au style "+style+".\n\n"+
+"📦 Vous recevez :\n"+
+"• "+qty+" fichier(s) numérique(s)\n"+
+"• Haute résolution\n"+
+"• Téléchargement après achat\n"+
+"• Aucun produit physique envoyé\n\n"+
+"Parfait pour garage, chambre, bureau, salon ou atelier.";
+
+let list=[
+"affiche voiture",
+"poster automobile",
+"deco garage",
+"cadeau voiture",
+"car wall art",
+"garage decor",
+"poster voiture",
+"digital download",
+"deco automobile",
+"passion auto",
+"affiche racing",
+"car poster",
+"wall art"
+];
+
+let tags=document.getElementById("tags");
+tags.innerHTML="";
+
+list.forEach(t=>{
+let s=document.createElement("span");
+s.className="tag";
+s.innerText=t;
+tags.appendChild(s);
+});
+
+document.getElementById("result").style.display="block";
+}
+</script>
+
+</body>
+</html>
