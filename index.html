@@ -2,82 +2,66 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>EtsyPilot</title>
 
 <style>
+*{box-sizing:border-box}
 body{
-margin:0;
-background:#0d0d0f;
-color:white;
-font-family:Arial,sans-serif;
+margin:0;background:#0d0d0f;color:white;
+font-family:Arial,sans-serif
 }
-.app{
-max-width:600px;
-margin:auto;
-padding:25px 18px;
-}
-h1{
-text-align:center;
-font-size:38px;
-margin-bottom:5px;
-}
+.app{max-width:650px;margin:auto;padding:25px 18px 60px}
+h1{text-align:center;font-size:38px;margin:20px 0 5px}
 h1 span{color:#ff5a5f}
-.subtitle{
-text-align:center;
-color:#aaa;
-margin-bottom:30px;
-}
+.subtitle{text-align:center;color:#aaa;margin-bottom:30px}
 .card{
-background:#19191d;
-padding:20px;
-border-radius:18px;
-margin-bottom:18px;
+background:#19191d;border:1px solid #29292f;
+padding:20px;border-radius:18px;margin-bottom:18px
 }
-label{
-display:block;
-margin-top:15px;
-margin-bottom:6px;
-font-weight:bold;
-}
+label{display:block;font-weight:bold;margin:15px 0 7px}
 input,select,textarea{
-width:100%;
-box-sizing:border-box;
-padding:14px;
-border-radius:12px;
-border:1px solid #333;
-background:#101014;
-color:white;
-font-size:16px;
+width:100%;padding:14px;border-radius:12px;
+border:1px solid #37373e;background:#101014;
+color:white;font-size:16px
 }
-textarea{height:90px}
+textarea{height:95px}
 button{
-width:100%;
-padding:17px;
-margin-top:20px;
-border:0;
-border-radius:14px;
-background:#ff5a5f;
-color:white;
-font-size:17px;
-font-weight:bold;
+width:100%;padding:17px;margin-top:18px;
+border:none;border-radius:14px;background:#ff5a5f;
+color:white;font-size:17px;font-weight:bold
 }
-#result{display:none}
+.secondary{background:#635bff}
 .box{
-background:#101014;
-padding:14px;
-border-radius:10px;
-margin-top:8px;
-white-space:pre-wrap;
+background:#101014;padding:14px;border-radius:12px;
+margin-top:8px;white-space:pre-wrap
 }
 .tag{
-display:inline-block;
-background:#303036;
-padding:7px 10px;
-margin:4px;
-border-radius:20px;
-font-size:13px;
+display:inline-block;background:#303036;
+padding:7px 10px;border-radius:20px;margin:4px;
+font-size:13px
 }
+#result,#imagesResult{display:none}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:10px;margin-top:15px
+}
+.imageCard{
+background:#101014;border:1px solid #333;
+border-radius:14px;min-height:180px;padding:12px;
+display:flex;flex-direction:column;
+justify-content:center;text-align:center
+}
+.imageCard strong{color:#ff5a5f;margin-bottom:8px}
+.imageCard small{color:#aaa;line-height:1.4}
+.status{
+display:inline-block;background:#1d3924;
+color:#7ee28c;padding:7px 12px;
+border-radius:20px;font-size:13px
+}
+.note{font-size:13px;color:#999;line-height:1.5}
 </style>
 </head>
 
@@ -86,7 +70,11 @@ font-size:13px;
 <div class="app">
 
 <h1>Etsy<span>Pilot</span></h1>
-<p class="subtitle">Ton assistant pour créer tes fiches Etsy 🚀</p>
+<p class="subtitle">Création automatique de produits Etsy 🚀</p>
+
+<div style="text-align:center;margin-bottom:20px">
+<span class="status">● EtsyPilot actif</span>
+</div>
 
 <div class="card">
 
@@ -99,7 +87,7 @@ font-size:13px;
 </select>
 
 <label>Modèle ou thème</label>
-<input id="model" placeholder="Ex : BMW M3 E46">
+<input id="model" placeholder="Ex : Ferrari F40">
 
 <label>Nombre d'affiches</label>
 <select id="qty">
@@ -116,20 +104,29 @@ font-size:13px;
 <option>JDM</option>
 <option>Vintage</option>
 <option>Luxe</option>
+<option>Minimaliste</option>
 </select>
 
 <label>Informations supplémentaires</label>
-<textarea id="info" placeholder="Ex : années 90, fond sombre..."></textarea>
+<textarea id="info"
+placeholder="Ex : années 90, fond sombre, texte technique, ambiance garage..."></textarea>
 
-<button onclick="generate()">✨ Générer ma fiche Etsy</button>
+<button onclick="generateListing()">
+✨ Générer ma fiche Etsy
+</button>
+
+<button class="secondary" onclick="prepareImages()">
+🎨 Préparer mes images
+</button>
 
 </div>
+
 
 <div class="card" id="result">
 
 <h2>✅ Fiche prête</h2>
 
-<label>Titre</label>
+<label>Titre Etsy</label>
 <div class="box" id="title"></div>
 
 <label>Prix conseillé</label>
@@ -143,38 +140,74 @@ font-size:13px;
 
 </div>
 
+
+<div class="card" id="imagesResult">
+
+<h2>🎨 Collection prête à générer</h2>
+
+<p class="note">
+EtsyPilot a préparé les visuels de ta collection.
+La génération réelle des images sera branchée à l'étape suivante.
+</p>
+
+<div class="grid" id="imageGrid"></div>
+
 </div>
 
-<script>
-function generate(){
+</div>
 
-let type=document.getElementById("type").value;
-let model=document.getElementById("model").value || type;
-let qty=document.getElementById("qty").value;
-let style=document.getElementById("style").value;
+
+<script>
+
+function data(){
+return{
+type:document.getElementById("type").value,
+model:document.getElementById("model").value.trim() || "Collection automobile",
+qty:parseInt(document.getElementById("qty").value),
+style:document.getElementById("style").value,
+info:document.getElementById("info").value.trim()
+}
+}
+
+
+function generateListing(){
+
+let d=data();
 
 let price="8,90 €";
-if(qty=="1")price="3,90 €";
-if(qty=="4")price="5,90 €";
-if(qty=="5")price="6,90 €";
+if(d.qty===1)price="3,90 €";
+if(d.qty===4)price="5,90 €";
+if(d.qty===5)price="6,90 €";
 
 document.getElementById("title").innerText=
-"Pack "+qty+" affiches "+model+
-" | Poster "+style+
-" | Déco garage | Téléchargement numérique";
+`Pack ${d.qty} affiches ${d.model} | Poster ${d.style} | Déco garage | Téléchargement numérique`;
 
 document.getElementById("price").innerText=price;
 
 document.getElementById("desc").innerText=
-"🏁 COLLECTION "+model.toUpperCase()+"\n\n"+
-"Découvrez ce pack de "+qty+
-" affiche(s) numérique(s) au style "+style+".\n\n"+
-"📦 Vous recevez :\n"+
-"• "+qty+" fichier(s) numérique(s)\n"+
-"• Haute résolution\n"+
-"• Téléchargement après achat\n"+
-"• Aucun produit physique envoyé\n\n"+
-"Parfait pour garage, chambre, bureau, salon ou atelier.";
+`🏁 COLLECTION ${d.model.toUpperCase()}
+
+Découvrez cette collection de ${d.qty} affiche(s) numérique(s) au style ${d.style}.
+
+📦 VOUS RECEVEZ :
+
+• ${d.qty} fichier(s) numérique(s)
+• Haute résolution
+• Téléchargement après achat
+• Aucun produit physique envoyé
+
+🏠 PARFAIT POUR :
+
+• Garage
+• Chambre
+• Bureau
+• Salon
+• Atelier
+• Gaming room
+
+🎁 Idéal pour les passionnés de véhicules et de décoration automobile.
+
+⚠️ Produit numérique uniquement.`;
 
 let list=[
 "affiche voiture",
@@ -196,14 +229,62 @@ let tags=document.getElementById("tags");
 tags.innerHTML="";
 
 list.forEach(t=>{
-let s=document.createElement("span");
-s.className="tag";
-s.innerText=t;
-tags.appendChild(s);
+let span=document.createElement("span");
+span.className="tag";
+span.innerText=t;
+tags.appendChild(span);
 });
 
 document.getElementById("result").style.display="block";
+document.getElementById("result").scrollIntoView({behavior:"smooth"});
 }
+
+
+function prepareImages(){
+
+let d=data();
+
+let scenes=[
+"ville de nuit sous la pluie",
+"garage automobile premium",
+"route de montagne au coucher du soleil",
+"circuit automobile",
+"station-service rétro de nuit",
+"tunnel éclairé au néon",
+"route côtière spectaculaire",
+"showroom automobile moderne",
+"parking urbain cinématique",
+"paysage montagneux dramatique"
+];
+
+let grid=document.getElementById("imageGrid");
+grid.innerHTML="";
+
+for(let i=0;i<d.qty;i++){
+
+let scene=scenes[i%scenes.length];
+
+let prompt=
+`${d.model}, ${d.type}, affiche automobile ${d.style}, ${scene}, composition verticale premium, véhicule au centre, photographie cinématique, détails réalistes, éclairage professionnel, poster de collection, qualité 4K`;
+
+if(d.info){
+prompt += ", "+d.info;
+}
+
+let card=document.createElement("div");
+card.className="imageCard";
+
+card.innerHTML=
+`<strong>IMAGE ${i+1}</strong>
+<small>${prompt}</small>`;
+
+grid.appendChild(card);
+}
+
+document.getElementById("imagesResult").style.display="block";
+document.getElementById("imagesResult").scrollIntoView({behavior:"smooth"});
+}
+
 </script>
 
 </body>
